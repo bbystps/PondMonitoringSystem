@@ -1,0 +1,415 @@
+:root {
+    --color-main: #172334;
+    --color-background: #0f172a;
+    --color-font: #d9d5dd;
+    --color-white: #ffffff;
+    --color-btn-primary: #2563eb;
+    --color-btn-secondary: #10b981;
+    --color-btn-danger: #ef4444;
+    --color-online: #10b981;
+    --color-btn-hover: #282828;
+    --color-border-line: rgba(77, 77, 97, 0.3);
+}
+
+/* Modal container */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto; /* Set to auto for content-based height adjustment */
+  min-height: 100%; /* Ensure the modal covers the full screen if content is short */
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+.modal-content {
+  background-color: var(--color-background);
+  color: var(--color-font);
+  margin: auto;
+  padding: 20px;
+  border: 1px solid var(--color-btn-hover);
+  border-radius: 10px;
+  height: auto; /* Allows height to adjust dynamically */
+  max-height: 90vh; /* Optional: prevents content overflow */
+  overflow-y: auto; /* Adds scrolling if content exceeds the available space */
+}
+.modal-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%; /* Ensures full height for vertical centering */
+  gap: 10px;
+}
+
+#promptSuccess, #promptError {
+  color: var(--color-font);
+}
+#promptSuccessSM, #promptErrorSM {
+  color: var(--color-font);
+  font-weight: 500;
+}
+
+.modal-header {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 3px;
+}
+.modal-body {
+  font-size: 12px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.modal-footer {
+  text-align: right;
+}
+.modal-xs {
+  width: 20%;
+}
+.modal-sm {
+  width: 30%;
+}
+.modal-md {
+  width: 50%;
+}
+.modal-lg {
+  width: 80%;
+}
+
+.device-location {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+.device-group {
+  display: flex;
+  gap: 12px;
+}
+.device-group > div {
+  flex: 1;
+}
+.device-location label {
+  display: inline-block;
+  font-weight: bold;
+  padding-bottom: 3px;
+}
+.device-location select, 
+.device-location input[type="text"] {
+  width: 100%;
+  padding: 5px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border: none;
+  border-radius: 3px;
+}
+.DateRange {
+  width: 100%;
+}
+.DateRange label, input {
+  width: 100%;
+  font-size: 14px;
+  padding: 5px; /* Padding inside inputs */
+  margin-top: 5px;
+}
+
+/* modal password */
+.modal-password-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers items horizontally */
+  justify-content: center; /* Centers items vertically */
+  max-width: 100%; /* Responsive width */
+}
+.modal-password-container form {
+  width: 100%; /* Make inputs take full width of the card */
+}
+.password-wrapper input{
+  width: 100%;
+  font-size: 14px;
+  padding: 5px; /* Padding inside inputs */
+  border-radius: 3px; /* Rounded corners */
+  margin-bottom: 10px;
+}
+.password-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  user-select: none;
+}
+.inputFlex {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+.inputFlex-div {
+  width: 100%;
+  padding: 5px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border: none;
+  border-radius: 3px;
+}
+.inputFlex-label {
+  font-size: 14px;
+}
+/* Button Elements */
+/* button default */
+button {
+  padding: 5px;
+  font-size: 14px;
+  border-radius: 2px;
+  border: 0;
+  cursor: pointer;
+}
+button:hover {
+  background-color: var(--color-btn-hover);
+  /* color: #000000; */
+}
+/* button color */
+.btn-color-white {
+  background-color: var(--color-white);
+  /* color: #000000; */
+}
+.btn-color-blue {
+  background-color: var(--color-btn-primary) ;
+  color: var(--color-white-color);
+}
+/* button sizes */
+.btn-large {
+  font-size: 20px;
+}
+.btn-medium {
+  font-size: 16px;
+}
+.btn-small {
+  font-size: 12px;
+}
+/* Design Space Elements */
+.mb-5 {
+  margin-bottom: 5px;
+}
+.mb-10 {
+  margin-bottom: 10px;
+}
+.mb-20 {
+  margin-bottom: 20px;
+}
+.mr-5 {
+  margin-right: 5px;
+}
+
+.mt-5 {
+  margin-top: 5px;
+}
+.mt-10 {
+  margin-top: 10px;
+}
+.mt-17 {
+  margin-top: 17px;
+}
+.mt-20 {
+  margin-top: 20px;
+}
+
+pb-20 {
+  padding-bottom: 20px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 90%;
+  }
+}
+
+
+/* Interval Selection - Radio Inputs */
+#SendIntervalModal .modal-content {
+  overflow-x: hidden;
+}
+/* Horizontal grid for 4 options */
+#SendIntervalModal .interval-grid {
+  display: grid;
+  grid-template-rows: repeat(4, 1fr);
+  gap: 10px;
+}
+/* Custom radio (renamed to avoid conflicts) */
+.interval-option {
+  position: relative;
+  padding-left: 28px;
+  margin: 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-font);
+  user-select: none;
+}
+.interval-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.interval-option .checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 18px;
+  width: 18px;
+  border: 2px solid var(--color-border-line);
+  border-radius: 50%;
+  background: transparent;
+  transition: border-color .2s ease;
+}
+.interval-option:hover .checkmark {
+  border-color: var(--color-btn-primary);
+}
+.interval-option input:checked ~ .checkmark {
+  border-color: var(--color-btn-primary);
+}
+.interval-option .checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-btn-primary);
+}
+.interval-option input:checked ~ .checkmark:after {
+  display: block;
+}
+
+
+/* THRESHOLD */
+
+/* Scoped to ThresholdModal */
+#ThresholdModal .modal-content {
+  width: min(500px, 90vw);
+  overflow-x: hidden;
+}
+
+/* Form grid layout */
+#ThresholdModal .threshold-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Each parameter group */
+#ThresholdModal .threshold-item {
+  display: grid;
+  grid-template-columns: 1fr 100px 100px;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Label styling */
+#ThresholdModal .threshold-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--color-font);
+}
+
+/* Inputs */
+#ThresholdModal .threshold-input {
+  padding: 6px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border-line);
+  background-color: rgba(255,255,255,0.1);
+  color: var(--color-font);
+  outline: none;
+}
+
+#ThresholdModal .threshold-input:focus {
+  border-color: var(--color-btn-primary);
+  background-color: rgba(255,255,255,0.15);
+}
+
+/* Mobile-friendly */
+@media (max-width: 500px) {
+  #ThresholdModal .threshold-item {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+  #ThresholdModal .threshold-label {
+    grid-column: 1 / -1;
+  }
+}
+
+/* FEEDER TIME SETTINGS */
+/* Scoped to FeederTimeModal to avoid collisions */
+
+
+.feeder-input-row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+#FeederTimeModal .modal-content {
+  width: min(460px, 90vw);
+  overflow-x: hidden;
+}
+
+#FeederTimeModal .feeder-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#FeederTimeModal .feeder-row {
+  display: grid;
+  grid-template-columns: 1fr 160px;
+  gap: 12px;
+  align-items: center;
+}
+
+#FeederTimeModal .feeder-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-font);
+}
+
+#FeederTimeModal .feeder-input {
+  padding: 6px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border-line);
+  background: rgba(255,255,255,0.1);
+  color: var(--color-font);
+  outline: none;
+}
+
+#FeederTimeModal .feeder-input:focus {
+  border-color: var(--color-btn-primary);
+  background: rgba(255,255,255,0.15);
+}
+
+#FeederTimeModal .feeder-hint {
+  font-size: 12px;
+  opacity: 0.8;
+  color: var(--color-font);
+}
+
+
+/* Mobile */
+@media (max-width: 520px) {
+  #FeederTimeModal .feeder-row {
+    grid-template-columns: 1fr;
+  }
+}
