@@ -293,11 +293,25 @@
     document.getElementById('end_date').value = "";
   }
 
+
+
   // EXPORT DATA MODAL START HERE
+
+  // Choices Modal
+  function openExportChoicesModal() {
+    const ExportChoicesModal = document.getElementById('ExportChoicesModal');
+    ExportChoicesModal.style.display = 'flex';
+  }
+
+  function closeExportChoicesModal() {
+    const ExportChoicesModal = document.getElementById('ExportChoicesModal');
+    ExportChoicesModal.style.display = 'none';
+  }
+
+  // Historical Export Modal
   function openExportDataModal() {
-
     $("#ExportDataForm")[0].reset();
-
+    closeExportChoicesModal();
     const ExportDataModal = document.getElementById('ExportDataModal');
     ExportDataModal.style.display = 'flex';
   }
@@ -351,6 +365,71 @@
       link.click();
       document.body.removeChild(link);
       closeExportDataModal();
+    } catch (error) {
+      console.error('Error downloading Excel:', error);
+    }
+  }
+
+
+
+  // Threshold Data Export Modal
+  function openExportThresholdModal() {
+    console.log("TH DATA OPEN MODAL");
+    $("#ThresholdDataForm")[0].reset();
+    closeExportChoicesModal();
+    const ExportThresholdModal = document.getElementById('ExportThresholdModal');
+    ExportThresholdModal.style.display = 'flex';
+  }
+
+  function closeExportThresholdModal() {
+    const ExportThresholdModal = document.getElementById('ExportThresholdModal');
+    ExportThresholdModal.style.display = 'none';
+  }
+
+  async function confirmExportThresholdModal() {
+    try {
+      let threshold_start_date = document.getElementById('threshold_start_date').value;
+      let threshold_end_date = document.getElementById('threshold_end_date').value;
+      let response = await fetch(`download_excel_th.php?start_date=${threshold_start_date}&end_date=${threshold_end_date}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data = await response.json();
+
+      if (data.length === 0) {
+        // alert('No data available to export.');
+        $("#promptErrorSM").text('No data available to export.');
+        openErrorModal();
+        return;
+      }
+
+      // Generate Excel file
+      const rows = [
+        ['Sensor', 'Value', 'Status', 'Timestamp'],
+        ...data.map(row => [
+          row.sensor,
+          row.value,
+          row.status,
+          row.timestamp
+        ])
+      ];
+
+      const csvContent = rows
+        .map(row => row.map(value => `"${value}"`).join(','))
+        .join('\n');
+
+      const blob = new Blob([csvContent], {
+        type: 'text/csv;charset=utf-8;'
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', "sensor_th_data" + `.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      closeExportThresholdModal();
     } catch (error) {
       console.error('Error downloading Excel:', error);
     }

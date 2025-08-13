@@ -29,8 +29,10 @@ if ($_SESSION['loggedin'] !== true) {
     <div class="header-title">Pond Monitoring System</div>
     <div class="header-right">
       <div class="header-notification">
-        <div class="header-notification-label">Last Updated</div>
-        <div class="header-notification-value">10:45 AM</div>
+        <!-- <div class="header-notification-label">Last Updated</div>
+        <div class="header-notification-value">10:45 AM</div> -->
+        <div class="header-notification-value">Cenon Bubihis</div>
+        <div class="header-notification-label">Bugaan East, Laurel, Batangas</div>
       </div>
       <button class="user-button" id="logoutButton" onclick="logout();"><i class="logout"></i></button>
     </div>
@@ -42,7 +44,8 @@ if ($_SESSION['loggedin'] !== true) {
     <div class="section-header">
       <div class="section-title">Real-Time Monitoring</div>
       <div class="section-row-buttons">
-        <div class="export-button" onclick="openExportDataModal();"><i class="download"></i>Export Data</div>
+        <!-- <div class="export-button" onclick="openExportDataModal();"><i class="download"></i>Export Data</div> -->
+        <div class="export-button" onclick="openExportChoicesModal();"><i class="download"></i>Export Data</div>
         <div class="settings-dropdown-wrapper">
           <div class="settings-button" id="settingsButton"><i class="settings"></i>Settings</div>
           <div class="settings-dropdown" id="settingsDropdown">

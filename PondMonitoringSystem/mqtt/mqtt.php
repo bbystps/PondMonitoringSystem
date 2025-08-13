@@ -28,8 +28,8 @@
     var options = {
         timeout: 3,
         keepAliveInterval: 60,
-        userName: '****',
-        password: '****',
+        userName: 'mqtt',
+        password: 'ICPHmqtt!',
         onSuccess: function() {
             client.subscribe('POND/SystemControl', {
                 qos: 0
@@ -41,6 +41,9 @@
                 qos: 0
             });
             client.subscribe('POND/SystemControl', {
+                qos: 0
+            });
+            client.subscribe('POND/EmailNotification', {
                 qos: 0
             });
             toastr.success('', 'Server OK!');
@@ -69,23 +72,6 @@
         message.qos = qos;
         client.send(message);
     }
-
-    // // Flag to prevent re-sending when updating from MQTT
-    // let isUpdatingFromMQTT = false;
-
-    // function handleModeToggle(checkbox) {
-    //     if (isUpdatingFromMQTT) return; // Skip publish if we're just syncing from MQTT
-
-    //     const mode = checkbox.checked ? "Auto" : "Manual";
-    //     console.log("Mode changed to:", mode);
-
-    //     // Send via MQTT
-    //     var message = new Messaging.Message(mode);
-    //     message.destinationName = 'POND/SystemControl';
-    //     message.qos = 0;
-    //     message.retained = true;
-    //     client.send(message);
-    // }
 
     client.onMessageArrived = function(message) {
         var x = message.payloadString;
@@ -162,6 +148,34 @@
                 changeStatusColor("feeder_status", "#282828");
                 document.getElementById("btn_feeder").disabled = false;
                 document.getElementById("btn_feeder").innerText = "Start Feeder";
+            }
+        }
+
+
+        // Handle EmailNotification alerts
+        else if (message.destinationName == "POND/EmailNotification") {
+            try {
+                var data = JSON.parse(x);
+
+                // Map sensor codes to friendly names
+                var sensorNames = {
+                    "TEMP": "Water Temperature",
+                    "DO": "Dissolved Oxygen",
+                    "pH": "pH Level"
+                };
+
+                var displaySensor = sensorNames[data.sensor] || data.sensor;
+                var msg = `Sensor Alert: ${displaySensor} is ${data.status} (Current Value: ${data.value})`;
+
+                toastr.info(msg, '', {
+                    closeButton: true,
+                    timeOut: 5000,
+                    progressBar: true,
+                    allowHtml: true
+                });
+
+            } catch (e) {
+                console.error("Invalid JSON from EmailNotification:", x);
             }
         }
 

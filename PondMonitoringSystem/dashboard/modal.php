@@ -150,6 +150,26 @@
   </div>
 </div>
 
+
+<div id="ExportChoicesModal" class="modal">
+  <div class="modal-content modal-xs">
+    <div class="modal-header">Export Data</div>
+    <div class="modal-body">
+      <div class="modal-choices">
+        <div class="choices-list" onclick="openExportDataModal();">
+          Historical Data
+        </div>
+        <div class="choices-list" onclick="openExportThresholdModal();">
+          Threshold Data
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-color-blue" onclick="closeExportChoicesModal();">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Export Data Modal -->
 <div id="ExportDataModal" class="modal">
   <div class="modal-content modal-xs">
@@ -177,6 +197,29 @@
     <div class="modal-footer">
       <button class="btn-color-blue" onclick="closeExportDataModal();">Cancel</button>
       <button class="btn-color-blue" onclick="confirmExportDataModal()">Export</button>
+    </div>
+  </div>
+</div>
+
+<!-- Export Threshold Modal -->
+<div id="ExportThresholdModal" class="modal">
+  <div class="modal-content modal-xs">
+    <div class="modal-header">Export Threshold Data</div>
+    <div class="modal-body">
+      <form id="ThresholdDataForm">
+        <div class="DateRange">
+          <label for="threshold_start_date">Start Date:</label>
+          <input id="threshold_start_date" name="threshold_start_date" type="date">
+        </div>
+        <div class="DateRange mt-10">
+          <label for="threshold_end_date">End Date:</label>
+          <input id="threshold_end_date" name="threshold_end_date" type="date">
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-color-blue" onclick="closeExportThresholdModal();">Cancel</button>
+      <button class="btn-color-blue" onclick="confirmExportThresholdModal()">Export</button>
     </div>
   </div>
 </div>
