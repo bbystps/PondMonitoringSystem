@@ -11,8 +11,8 @@ import time
 def get_db_connection():
     return pymysql.connect(
         host='localhost',
-        user='****',
-        password='****',
+        user='root',
+        password='',
         database='pond_monitoring',
         autocommit=True
     )
@@ -51,8 +51,8 @@ client = mqtt.Client()
 client.on_connect = on_connect
 client.on_disconnect = on_disconnect
 
-username = "****"
-password = "****"
+username = "mqtt"
+password = "ICPHmqtt!"
 client.username_pw_set(username, password)
 
 try:

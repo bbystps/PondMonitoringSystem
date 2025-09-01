@@ -1,4 +1,4 @@
-:root {
+/* :root {
     --color-main: #172334;
     --color-background: #0f172a;
     --color-font: #d9d5dd;
@@ -9,7 +9,7 @@
     --color-online: #10b981;
     --color-btn-hover: #282828;
     --color-border-line: rgba(77, 77, 97, 0.3);
-}
+} */
 
 /* Modal container */
 .modal {
@@ -200,6 +200,9 @@ button:hover {
 /* Design Space Elements */
 .mb-5 {
   margin-bottom: 5px;
+}
+.mb-6 {
+  margin-bottom: 6px;
 }
 .mb-10 {
   margin-bottom: 10px;

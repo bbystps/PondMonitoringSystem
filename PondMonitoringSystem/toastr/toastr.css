@@ -100,6 +100,7 @@ button.toast-close-button {
   box-sizing: border-box;
 }
 #toast-container > div {
+  font-size: 18px;
   position: relative;
   pointer-events: auto;
   overflow: hidden;

@@ -183,6 +183,7 @@
           message.qos = 0;
           message.retained = true;
           client.send(message);
+          updateSensorDisplay();
 
         } else {
           console.log("Error:", response.message);

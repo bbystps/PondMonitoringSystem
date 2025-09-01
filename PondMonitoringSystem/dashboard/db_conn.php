@@ -2,5 +2,5 @@
 // Database connection
 $host = 'localhost';
 $dbname = 'pond_monitoring';
-$username = '****';
-$password = '****';
+$username = 'root';
+$password = '';

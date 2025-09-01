@@ -1,6 +1,6 @@
 <?php
 session_start();
-$connect = new mysqli("localhost", "****", "****", "pond_monitoring");
+$connect = new mysqli("localhost", "root", "", "pond_monitoring");
 
 if ($connect->connect_error) {
   die("Connection Failed: " . $connect->connect_error);
