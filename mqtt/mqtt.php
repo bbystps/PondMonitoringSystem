@@ -1,0 +1,239 @@
+<script>
+    var i = 0;
+    var client = new Messaging.Client("13.214.212.87", 9001, "myclientid_" + parseInt(Math.random() * 100, 10));
+
+    client.onConnectionLost = function(responseObject) {
+        toastr.error('Trying to reconnect...', 'Server not responding.', {
+            closeButton: true,
+            timeOut: 3000,
+            progressBar: true,
+            allowHtml: true
+        });
+        MQTTreconnect();
+    };
+
+    function MQTTreconnect() {
+        if (client.connected) {
+            return;
+        }
+        //console.log("ATTEMPTING TO RECONNECT");
+        // Set a timeout before attempting to reconnect
+        setTimeout(function() {
+            // Try to reconnect
+            client.connect(options);
+        }, 5000); // You can adjust the timeout duration as needed
+    }
+
+    //Connect Options
+    var options = {
+        timeout: 3,
+        keepAliveInterval: 60,
+        userName: 'mqtt',
+        password: 'ICPHmqtt!',
+        onSuccess: function() {
+            client.subscribe('POND/SystemControl', {
+                qos: 0
+            });
+            client.subscribe('POND/WebDataUpdate', {
+                qos: 0
+            });
+            client.subscribe('POND/AllRelayStatus', {
+                qos: 0
+            });
+            client.subscribe('POND/SystemControl', {
+                qos: 0
+            });
+            client.subscribe('POND/EmailNotification', {
+                qos: 0
+            });
+            client.subscribe('POND/FeederCount', {
+                qos: 0
+            });
+            client.subscribe('POND/DeviceStatus', {
+                qos: 0
+            });
+            toastr.success('', 'Server OK!');
+
+            var message = new Messaging.Message('New Message');
+            message.destinationName = 'POND/serverInitiate';
+            message.qos = 0;
+            client.send(message);
+        },
+
+        onFailure: function(message) {
+            toastr.error('Trying to reconnect...', 'Server not responding.', {
+                closeButton: true,
+                timeOut: 3000,
+                progressBar: true,
+                allowHtml: true
+            });
+            MQTTreconnect();
+        }
+
+    };
+
+    var publish = function(payload, topic, qos) {
+        var message = new Messaging.Message(payload);
+        message.destinationName = topic;
+        message.qos = qos;
+        client.send(message);
+    }
+
+    client.onMessageArrived = function(message) {
+        var x = message.payloadString;
+        console.log(x);
+
+        // Sync Toggle Switch to retain value
+        if (message.destinationName == "POND/SystemControl") {
+            // Sync the toggle state based on retained message
+            // isUpdatingFromMQTT = true;
+            document.getElementById("modeToggle").checked = (x === "Auto");
+            // isUpdatingFromMQTT = false;
+
+            const isAuto = document.getElementById("modeToggle").checked;
+            if (isAuto) {
+                console.log("Currently in Auto mode");
+
+                document.getElementById("btn_pump").disabled = true;
+                document.getElementById("btn_aerator").disabled = true;
+                document.getElementById("btn_feeder").disabled = true;
+            } else {
+                console.log("Currently in Manual mode");
+
+                document.getElementById("btn_pump").disabled = false;
+                document.getElementById("btn_aerator").disabled = false;
+                document.getElementById("btn_feeder").disabled = false;
+            }
+        }
+        // Web Update for new sensor data
+        else if (message.destinationName == "POND/WebDataUpdate") {
+            DisplaySensorData();
+            // fetchLatestData();
+            updateChart();
+        }
+
+        // Feeder count updates
+        else if (message.destinationName == "POND/FeederCount") {
+            var ParsedData = JSON.parse(x);
+            console.log(x);
+            const count = Number(ParsedData.feeder_count) || 0;
+            console.log(count);
+
+            // Update the count
+            document.getElementById("feeder_count").innerText = count;
+
+            // Change icon color based on count
+            var icon = document.getElementById("feeder_icon");
+            if (count === 0) {
+                changeButtonColor("btn_feeder", "#282828");
+                changeStatusColor("feeder_status", "yellow");
+                document.getElementById("btn_feeder").disabled = true;
+                icon.style.background = "red"; // empty = red
+
+                // (ADDED) start repeating toastr every 2s while empty
+                startFeederAlertTimer();
+                // also show immediately once on arrival
+                showFeederEmptyAlert();
+
+            } else {
+                icon.style.background = "green"; // has feed = green
+                // (ADDED) stop repeating toastr
+                stopFeederAlertTimer();
+            }
+        }
+
+        // Web Update for new sensor data
+        else if (message.destinationName == "POND/DeviceStatus") {
+            var ParsedData = JSON.parse(x);
+            console.log(x);
+            console.log(ParsedData.status);
+
+            var icon = document.getElementById("device_status");
+            // Change icon color based on count
+            if (ParsedData.status == "offline") {
+                icon.style.background = "red"; // empty = red
+            } else {
+                icon.style.background = "green"; // has feed = green
+            }
+        }
+
+        // Relay Triggering 
+        else if (message.destinationName == "POND/AllRelayStatus") {
+            var ParsedData = JSON.parse(x);
+            console.log(ParsedData.pump);
+            console.log(ParsedData.aerator);
+            console.log(ParsedData.feeder);
+
+            if (ParsedData.pump == "1") {
+                changeButtonColor("btn_pump", "#ef4444");
+                changeStatusColor("pump_status", "#10b981");
+                document.getElementById("btn_pump").disabled = false;
+                document.getElementById("btn_pump").innerText = "Stop Pump";
+            } else if (ParsedData.pump == "0") {
+                changeButtonColor("btn_pump", "#10b981");
+                changeStatusColor("pump_status", "#282828");
+                document.getElementById("btn_pump").disabled = false;
+                document.getElementById("btn_pump").innerText = "Start Pump";
+            }
+
+            if (ParsedData.aerator == "1") {
+                changeButtonColor("btn_aerator", "#ef4444");
+                changeStatusColor("aerator_status", "#10b981");
+                document.getElementById("btn_aerator").disabled = false;
+                document.getElementById("btn_aerator").innerText = "Stop Aerator";
+            } else if (ParsedData.aerator == "0") {
+                changeButtonColor("btn_aerator", "#10b981");
+                changeStatusColor("aerator_status", "#282828");
+                document.getElementById("btn_aerator").disabled = false;
+                document.getElementById("btn_aerator").innerText = "Start Aerator";
+            }
+
+
+            if (ParsedData.feeder == "1") {
+                changeButtonColor("btn_feeder", "#ef4444");
+                changeStatusColor("feeder_status", "#10b981");
+                document.getElementById("btn_feeder").disabled = false;
+                document.getElementById("btn_feeder").innerText = "Stop Feeder";
+            } else if (ParsedData.feeder == "0") {
+
+                feederCount = document.getElementById("feeder_count").innerText;
+                console.log("feeder Count:" + feederCount);
+                if (feederCount != 0) {
+                    changeButtonColor("btn_feeder", "#10b981");
+                    changeStatusColor("feeder_status", "#282828");
+                    document.getElementById("btn_feeder").disabled = false;
+                    document.getElementById("btn_feeder").innerText = "Start Feeder";
+                }
+            }
+        }
+
+
+        // Handle EmailNotification alerts
+        else if (message.destinationName == "POND/EmailNotification") {
+            try {
+                var data = JSON.parse(x);
+
+                // Map sensor codes to friendly names
+                var sensorNames = {
+                    "TEMP": "Water Temperature",
+                    "DO": "Dissolved Oxygen",
+                    "pH": "pH Level"
+                };
+
+                var displaySensor = sensorNames[data.sensor] || data.sensor;
+                var msg = `Sensor Alert: ${displaySensor} is ${data.status} (Current Value: ${data.value})`;
+
+                toastr.info(msg, '', {
+                    closeButton: true,
+                    timeOut: 5000,
+                    progressBar: true,
+                    allowHtml: true
+                });
+
+            } catch (e) {
+                console.error("Invalid JSON from EmailNotification:", x);
+            }
+        }
+
+    }
+</script>

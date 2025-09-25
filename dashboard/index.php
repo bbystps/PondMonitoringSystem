@@ -42,7 +42,9 @@
 
   <div class="container-divider">
     <div class="section-header">
-      <div class="section-title">Real-Time Monitoring</div>
+      <div class="section-title">
+        Real-Time Monitoring
+      </div>
       <div class="section-row-buttons">
         <!-- <div class="export-button" onclick="openExportDataModal();"><i class="download"></i>Export Data</div> -->
         <div class="export-button" onclick="openExportChoicesModal();"><i class="download"></i>Export Data</div>
@@ -52,8 +54,10 @@
             <div class="dropdown-item" onclick="openSendIntervalModal()">Interval Selection</div>
             <div class="dropdown-item" onclick="openThresholdModal()">Threshold Configuration</div>
             <div class="dropdown-item" onclick="openFeederTimeModal()">Feeder Time Configuration</div>
+            <div class="dropdown-item" onclick="openFeederCountModal()">Feeder Count Configuration</div>
           </div>
         </div>
+        <div class="device-status"><i class="sharp-circle" id="device_status"></i>Device Status</div>
       </div>
     </div>
 
@@ -119,14 +123,19 @@
       </div>
 
       <div class="system-control">
-        <!-- <div class="section-sub-header">
-          <div class="section-title">System Control</div>
-          <label class="toggle-switch">
-            <input type="checkbox" id="modeToggle" onchange="handleModeToggle(this)">
-            <span class="slider"></span>
-            <span class="labels" data-on="Auto" data-off="Manual"></span>
-          </label>
-        </div> -->
+
+        <div class="feeder-notification">
+          <div class="feeder-status-message" id="feeder_status_msg">
+            <div class="feeder-status">
+              <i class="info-icon" id="feeder_icon"></i>
+              <span id="feeder_status_notif">Feeder has sufficient feed.</span>
+            </div>
+            <span id="feeder_count" style="float: right; font-weight: bold;">--</span>
+          </div>
+          <button id="btn_refill" class="btn-refill" onclick="markFeederRefilled()" style="display: none;">
+            Mark as Refilled
+          </button>
+        </div>
 
         <div class="section-sub-header">
           <div class="section-title mb-6">System Control</div>
@@ -358,5 +367,83 @@
   });
 </script>
 
+
+<script>
+  // Global variable to keep track of the interval
+  let feederAlertInterval = null;
+
+  // Start showing toastr every 2s
+  function startFeederAlertTimer() {
+    if (!feederAlertInterval) { // prevent multiple intervals
+      feederAlertInterval = setInterval(showFeederEmptyAlert, 2000);
+    }
+  }
+
+  // Stop showing toastr
+  function stopFeederAlertTimer() {
+    if (feederAlertInterval) {
+      clearInterval(feederAlertInterval);
+      feederAlertInterval = null;
+    }
+    // Optional: clear existing toastr messages
+    if (typeof toastr !== "undefined") {
+      toastr.clear();
+    }
+  }
+
+  // Your existing alert function
+  function showFeederEmptyAlert() {
+    document.getElementById('feeder_status_notif').innerText =
+      "Feeder is empty. Please refill.";
+    document.getElementById('btn_refill').style.display = 'inline-block';
+
+    toastr.error('Feeder is empty', 'Please refill.', {
+      closeButton: true,
+      timeOut: 3000,
+      progressBar: true,
+      allowHtml: true,
+      preventDuplicates: true
+    });
+  }
+
+  function markFeederRefilled() {
+    $.ajax({
+      type: "POST",
+      url: "reset_feeder_count.php",
+      dataType: "json",
+      success: function(response) {
+        if (response.status === 'success') {
+          const newCount = response.new_count;
+
+          console.log("Feeder marked as refilled");
+          document.getElementById('feeder_status_notif').innerText =
+            "Feeder has sufficient feed.";
+          document.getElementById('btn_refill').style.display = 'none';
+
+          // Publish retained JSON payload with the updated count
+          var payload = JSON.stringify({
+            feeder_count: newCount
+          });
+
+          var message = new Messaging.Message(payload);
+          message.destinationName = 'POND/FeederCount';
+          message.qos = 0;
+          message.retained = true;
+          client.send(message);
+          console.log("Feeder count reset and published:", payload);
+        } else {
+          console.log("Error:", response.message);
+          $("#promptErrorSM").text("Failed to Reset Feeder Count");
+          openErrorModal();
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error(xhr.responseText);
+        $("#promptErrorSM").text("Failed to Reset Feeder Count");
+        openErrorModal();
+      }
+    });
+  }
+</script>
 
 </html>

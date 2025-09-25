@@ -1,3 +1,20 @@
+<!-- Threshold Configuration Modal -->
+<div id="FeederCountModal" class="modal">
+  <div class="modal-content modal-xs">
+    <div class="modal-header">Feeder Count Configuration</div>
+    <div class="modal-body">
+      <form id="FeederCountForm" enctype="multipart/form-data">
+        <div class="feeder-label">Feeder Count</div>
+        <input type="number" id="feederCount" name="feederCount" class="threshold-input">
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-color-blue" onclick="closeFeederCountModal();">Cancel</button>
+      <button class="btn-color-blue" onclick="confirmFeederCountModal()">Confirm</button>
+    </div>
+  </div>
+</div>
+
 <!-- SendingInterval Modal -->
 <div id="SendIntervalModal" class="modal">
   <div class="modal-content modal-xs">

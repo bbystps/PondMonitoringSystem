@@ -202,6 +202,70 @@
   }
 
   // Feeder Time Modal
+  function openFeederCountModal() {
+    $.ajax({
+      type: "POST",
+      url: "fetch_feeder_count.php",
+      dataType: "json",
+      success: function(response) {
+        console.log(response);
+        if (response.error) {
+          console.error(response.error);
+        } else {
+          // Populate the input fields
+          $("#feederCount").val(response.reset_count);
+          const FeederCountModal = document.getElementById('FeederCountModal');
+          FeederCountModal.style.display = 'flex';
+          const dropdown = document.getElementById('settingsDropdown');
+          dropdown.style.display = 'none';
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error("AJAX Error:", error);
+      }
+    });
+  }
+
+  function closeFeederCountModal() {
+    const FeederCountModal = document.getElementById('FeederCountModal');
+    FeederCountModal.style.display = 'none';
+  }
+
+  function confirmFeederCountModal() {
+    console.log("Saving New Feeder Count Configuration");
+    let formData = new FormData($("#FeederCountForm")[0]);
+    $.ajax({
+      type: "POST",
+      url: "update_feeder_count.php",
+      data: formData,
+      processData: false,
+      contentType: false,
+      cache: false,
+      dataType: "json",
+      success: function(response) {
+        if (response.status === 'success') {
+          console.log(response.message);
+          closeFeederCountModal();
+          $("#promptSuccessSM").text("Feeder Count Updated Successfully.");
+          openSuccessModal();
+        } else {
+          console.log("Error:", response.message);
+          $("#promptErrorSM").text("Failed to Change Feeder Count");
+          closeFeederCountModal();
+          openErrorModal();
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error(xhr.responseText);
+        $("#promptErrorSM").text("Failed to Change Feeder Count");
+        closeFeederCountModal();
+        openErrorModal();
+      }
+    });
+  }
+
+
+  // Feeder Time Modal
   function openFeederTimeModal() {
     $.ajax({
       type: "POST",

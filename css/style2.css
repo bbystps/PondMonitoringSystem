@@ -222,6 +222,67 @@ body {
     gap: 10px;
     height: 100%;
 }
+
+.feeder-status-icon i{
+    background-color: var(--color-btn-danger);
+}
+.feeder-notification {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border-line);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 0.8em;
+  color: var(--color-font);
+}
+
+.feeder-status-message {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+}
+.feeder-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.feeder-status-message i.info-icon {
+  background-color: var(--color-online);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--color-white);
+}
+
+.btn-refill {
+  display: block;
+  width: calc(100% - 20px);   /* full width but with side spacing */
+  margin: 0 auto 10px auto;   /* center it and add bottom spacing */
+  padding: 10px;
+  font-size: 13px;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--color-btn-secondary);
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: center;
+}
+
+.btn-refill:hover {
+  background-color: var(--color-btn-hover);
+}
+
+
 .control-buttons {
     /* background-color: var(--color-main); */
     background-color: var(--color-white);
@@ -328,6 +389,22 @@ body {
     align-items: center;
     gap: 10px;
 }
+.device-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background-color: var(--color-white);
+    color: var(--color-font);
+    font-size: 12px;
+    padding: 7px 12px;
+    border: none;
+    border-radius: 6px;
+}
+
+.device-status i{
+    background-color: #10b981;
+}
 
 /* Settings dropdown */
 .settings-dropdown-wrapper {
@@ -381,7 +458,7 @@ body {
     display: flex;                  /* turn into flex container */
     align-items: center;            /* vertical center */
     justify-content: center;        /* horizontal center */
-    padding: 7px 14px;
+    padding: 7px 12px;
     background-color: var(--color-btn-primary);
     color: var(--color-white);
     border: none;

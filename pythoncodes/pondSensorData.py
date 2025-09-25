@@ -33,6 +33,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("POND/SensorData")
     client.subscribe("POND/ReqThreshold")
     client.subscribe("POND/ReqSendInterval")
+    client.subscribe("POND/AllRelayStatus")
 
 def on_disconnect(client, userdata, rc):
     print(f"Disconnected from MQTT broker with result code {rc}. Attempting to reconnect...")
@@ -46,7 +47,7 @@ def on_disconnect(client, userdata, rc):
             time.sleep(5)
 
 def on_message(client, userdata, message):
-    print(f"Message received on topic: {message.topic}")
+    # print(f"Message received on topic: {message.topic}")
     msg_main = str(message.payload.decode("utf-8"))
     print(f"Received message on topic {message.topic}: {msg_main}")
     
@@ -59,6 +60,49 @@ def on_message(client, userdata, message):
     elif message.topic.startswith("POND/ReqSendInterval"):
         print("Send Interval has been requested")
         get_send_interval()
+    elif message.topic.startswith("POND/AllRelayStatus"):
+        print("AllRelayStatus received")
+        process_all_relay_status(msg_main)
+        
+def process_all_relay_status(msg_main):
+    # Parse JSON first (keep JSON-related errors here)
+    try:
+        json_msg_main = json.loads(msg_main)
+    except json.JSONDecodeError as e:
+        print(f"Failed to decode JSON: {e}")
+        return
+
+    # Get feeder value (accept "1" or 1)
+    feeder_val = json_msg_main.get("feeder", 0)
+    feeder_is_one = str(feeder_val).strip() == "1"
+
+    if not feeder_is_one:
+        return  # nothing to do if feeder != 1
+
+    # DB ops + publish
+    reconnect_db()
+    try:
+        # Decrement but never below zero
+        cursor.execute("""
+            UPDATE feeder_count
+            SET count = CASE WHEN count > 0 THEN count - 1 ELSE 0 END
+            WHERE id = 1
+        """)
+        conn.commit()
+
+        # Read back the new count
+        cursor.execute("SELECT count FROM feeder_count WHERE id = 1")
+        row = cursor.fetchone()
+        new_count = int(row[0]) if row else 0
+
+        # Publish retained update
+        payload = json.dumps({"feeder_count": new_count})
+        client.publish("POND/FeederCount", payload, qos=0, retain=True)
+        print(f"[Feeder] Decremented. New count={new_count}. Published to FeederCount.")
+
+    except Exception as e:
+        print(f"An unexpected error occurred during feeder update: {e}")
+        conn.rollback()
 
 def process_data(topic, msg_main):
     try:

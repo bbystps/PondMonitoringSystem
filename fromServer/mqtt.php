@@ -169,7 +169,7 @@
 
                 toastr.info(msg, '', {
                     closeButton: true,
-                    timeOut: 5000,
+                    timeOut: 10000,
                     progressBar: true,
                     allowHtml: true
                 });

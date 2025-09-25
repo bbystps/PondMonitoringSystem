@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<?php
+session_start();
+if ($_SESSION['loggedin'] !== true) {
+  header("Location: ../index.php");
+  exit();
+}
+?>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pond Monitoring System</title>
+
+  <link href="../css/style5.css" rel="stylesheet">
+  <link href="../css/montserrat.css" rel='stylesheet'>
+  <link href="../css/icon2.css" rel='stylesheet'>
+  <link href="../css/element.css" rel='stylesheet'>
+  <link rel="stylesheet" href="../toastr/toastr.css">
+</head>
+
+<script src="../mqtt/mqttws31.js"></script>
+<?php include("../mqtt/mqtt.php"); ?>
+
+<body onload="client.connect(options);">
+  <div class="header">
+    <div class="header-title">Pond Monitoring System</div>
+    <div class="header-right">
+      <div class="header-notification">
+        <!-- <div class="header-notification-label">Last Updated</div>
+        <div class="header-notification-value">10:45 AM</div> -->
+        <div class="header-notification-value">Cenon Bubihis</div>
+        <div class="header-notification-label">Bugaan East, Laurel, Batangas</div>
+      </div>
+      <button class="user-button" id="logoutButton" onclick="logout();"><i class="logout"></i></button>
+    </div>
+
+  </div>
+  </div>
+
+  <div class="container-divider">
+    <div class="section-header">
+      <div class="section-title">Real-Time Monitoring</div>
+      <div class="section-row-buttons">
+        <!-- <div class="export-button" onclick="openExportDataModal();"><i class="download"></i>Export Data</div> -->
+        <div class="export-button" onclick="openExportChoicesModal();"><i class="download"></i>Export Data</div>
+        <div class="settings-dropdown-wrapper">
+          <div class="settings-button" id="settingsButton"><i class="settings"></i>Settings</div>
+          <div class="settings-dropdown" id="settingsDropdown">
+            <div class="dropdown-item" onclick="openSendIntervalModal()">Interval Selection</div>
+            <div class="dropdown-item" onclick="openThresholdModal()">Threshold Configuration</div>
+            <div class="dropdown-item" onclick="openFeederTimeModal()">Feeder Time Configuration</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider">
+
+      <div class="container-top">
+
+        <div class="cards">
+          <div class="card-left-data">
+            <div class="card-icon temp-icon"><i class="temperature"></i></div>
+            <div class="card-label">
+              <div class="card-label-name">Water Temperature</div>
+              <div class="card-label-reading">Current reading</div>
+            </div>
+          </div>
+          <div class="card-right-data">
+            <div class="card-current temp-current"><span id="wt_value">--</span> <span class="card-current-unit">°C</span></div>
+            <div class="card-target">Target: <span id="wt_low">00</span>-<span id="wt_high">00</span>°C</div>
+          </div>
+        </div>
+
+        <div class="cards">
+          <div class="card-left-data">
+            <div class="card-icon ph-icon"><i class="flask"></i></div>
+            <div class="card-label">
+              <div class="card-label-name">pH Level</div>
+              <div class="card-label-reading">Current reading</div>
+            </div>
+          </div>
+          <div class="card-right-data">
+            <div class="card-current ph-current"><span id="ph_value">--</span></div>
+            <div class="card-target">Target: <span id="ph_low">0</span>-<span id="ph_high">0</span></div>
+          </div>
+        </div>
+
+        <div class="cards">
+          <div class="card-left-data">
+            <div class="card-icon do-icon"><i class="air"></i></div>
+            <div class="card-label">
+              <div class="card-label-name">Dissolved Oxygen</div>
+              <div class="card-label-reading">Current reading</div>
+            </div>
+          </div>
+          <div class="card-right-data">
+            <div class="card-current do-current"><span id="do_value">--</span> <span class="card-current-unit">mg/L</span></div>
+            <div class="card-target">Target: <span id="do_low">0</span>-<span id="do_high">0</span> mg/L</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="container-bottom">
+
+      <div class="history-section">
+        <div class="section-sub-header">
+          <div class="section-title">Historical Data</div>
+          <div class="history-date-select"><i class="ion--calendar-sharp" onclick="openDateRangePickerModal();"></i></div>
+        </div>
+        <div class="historical-graph">
+          <div id="history_chart">No Data</div>
+        </div>
+      </div>
+
+      <div class="system-control">
+        <!-- <div class="section-sub-header">
+          <div class="section-title">System Control</div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="modeToggle" onchange="handleModeToggle(this)">
+            <span class="slider"></span>
+            <span class="labels" data-on="Auto" data-off="Manual"></span>
+          </label>
+        </div> -->
+
+        <div class="section-sub-header">
+          <div class="section-title">System Control</div>
+
+          <label class="toggle-switch">
+            <span class="toggle-label">Manual</span>
+            <input type="checkbox" id="modeToggle" onchange="handleModeToggle(this)">
+            <span class="slider"></span>
+            <span class="toggle-label">Auto</span>
+          </label>
+        </div>
+
+
+        <div class="control-buttons">
+
+          <div class="control-group">
+            <div class="control-labels">
+              <div class="control-title"><i class="feeder"></i>Feeder</div>
+              <div class="control-status"><i class="circle-solid" id="feeder_status"></i></div>
+            </div>
+            <button class="control-button btn-start" id="btn_feeder">Start Feeder</button>
+          </div>
+
+          <div class="control-group">
+            <div class="control-labels">
+              <div class="control-title"><i class="water-pump"></i>Water Pump</div>
+              <div class="control-status"><i class="circle-solid" id="pump_status"></i></div>
+            </div>
+            <button class="control-button btn-start" id="btn_pump">Start Pump</button>
+          </div>
+
+          <div class="control-group">
+            <div class="control-labels">
+              <div class="control-title"><i class="aerator"></i>Aerator</div>
+              <div class="control-status"><i class="circle-solid" id="aerator_status"></i></div>
+            </div>
+            <button class="control-button btn-start" id="btn_aerator">Start Aerator</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <?php include("modal.php"); ?>
+
+  <script src="../js/jquery.min.js"></script>
+  <script src="../toastr/toastr.min.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+</body>
+
+<?php include("script_modal.php"); ?>
+<?php include("script_chart2.php"); ?>
+
+<script>
+  function logout() {
+    window.location.replace("../login/logout.php");
+  }
+</script>
+
+<script>
+  $(document).ready(function() {
+    DisplaySensorData();
+    updateChart();
+    updateSensorDisplay();
+  });
+
+  function DisplaySensorData() {
+    $.ajax({
+      url: 'fetch_data.php',
+      type: 'GET',
+      dataType: 'json',
+      success: function(response) {
+        response.forEach(function(data) {
+          document.getElementById("wt_value").innerText = `${data.wt}`;
+          document.getElementById("ph_value").innerText = `${data.ph}`;
+          document.getElementById("do_value").innerText = `${data.do}`;
+        });
+      },
+      error: function(xhr, status, error) {
+        console.error('AJAX Error:', status, error);
+      }
+    });
+  }
+
+  function updateSensorDisplay() {
+    $.ajax({
+      url: 'fetch_threshold.php',
+      type: 'GET',
+      dataType: 'json',
+      success: function(response) {
+        document.getElementById("wt_low").innerText = `${response.wt_low}`;
+        document.getElementById("wt_high").innerText = `${response.wt_high}`;
+        document.getElementById("ph_low").innerText = `${response.ph_low}`;
+        document.getElementById("ph_high").innerText = `${response.ph_high}`;
+        document.getElementById("do_low").innerText = `${response.do_low}`;
+        document.getElementById("do_high").innerText = `${response.do_high}`;
+      },
+      error: function(xhr, status, error) {
+        console.error('AJAX Error:', status, error);
+      }
+    });
+  }
+</script>
+
+<!-- Buttons Save Retain Values - SystemControl, Feeder Time -->
+<script>
+  function handleModeToggle(checkbox) {
+    const mode = checkbox.checked ? "Auto" : "Manual";
+    console.log("Mode changed to:", mode);
+    // Send via MQTT
+    var message = new Messaging.Message(mode);
+    message.destinationName = 'POND/SystemControl';
+    message.qos = 0;
+    message.retained = true;
+    client.send(message);
+    const isAuto = document.getElementById("modeToggle").checked;
+    if (isAuto) {
+      console.log("Currently in Auto mode");
+
+      document.getElementById("btn_pump").disabled = true;
+      document.getElementById("btn_aerator").disabled = true;
+      document.getElementById("btn_feeder").disabled = true;
+    } else {
+      console.log("Currently in Manual mode");
+    }
+
+  }
+</script>
+
+
+<!-- Relay Buttons -->
+<script>
+  function changeButtonColor(buttonId, colorClass) {
+    let buttonColor = document.getElementById(buttonId);
+    buttonColor.style.backgroundColor = colorClass;
+  }
+
+  function changeStatusColor(statusId, colorClass) {
+    let statusColor = document.getElementById(statusId);
+    statusColor.style.backgroundColor = colorClass;
+  }
+
+  let btnPump = document.getElementById("btn_pump");
+  btnPump.addEventListener("click", function() {
+    if (btnPump.innerText.includes("Start")) {
+      changeButtonColor("btn_pump", "#282828");
+      changeStatusColor("pump_status", "yellow");
+      var message = new Messaging.Message('pump:start');
+      message.destinationName = 'POND/RelayToggle';
+      message.qos = 0;
+      client.send(message);
+      document.getElementById("btn_pump").disabled = true;
+    } else {
+      changeButtonColor("btn_pump", "#282828");
+      changeStatusColor("pump_status", "yellow");
+      var message = new Messaging.Message('pump:stop');
+      message.destinationName = 'POND/RelayToggle';
+      message.qos = 0;
+      client.send(message);
+      document.getElementById("btn_pump").disabled = true;
+    }
+  });
+
+  let btnAerator = document.getElementById("btn_aerator");
+  btnAerator.addEventListener("click", function() {
+    if (btnAerator.innerText.includes("Start")) {
+      changeButtonColor("btn_aerator", "#282828");
+      changeStatusColor("aerator_status", "yellow");
+      var message = new Messaging.Message('aerator:start');
+      message.destinationName = 'POND/RelayToggle';
+      message.qos = 0;
+      client.send(message);
+      document.getElementById("btn_aerator").disabled = true;
+    } else {
+      changeButtonColor("btn_aerator", "#282828");
+      changeStatusColor("aerator_status", "yellow");
+      var message = new Messaging.Message('aerator:stop');
+      message.destinationName = 'POND/RelayToggle';
+      message.qos = 0;
+      client.send(message);
+      document.getElementById("btn_aerator").disabled = true;
+    }
+  });
+
+  let btnFeeder = document.getElementById("btn_feeder");
+  btnFeeder.addEventListener("click", function() {
+    if (btnFeeder.innerText.includes("Start")) {
+      changeButtonColor("btn_feeder", "#282828");
+      changeStatusColor("feeder_status", "yellow");
+      var message = new Messaging.Message('feeder:start');
+      message.destinationName = 'POND/RelayToggle';
+      message.qos = 0;
+      client.send(message);
+      document.getElementById("btn_feeder").disabled = true;
+    } else {
+      changeButtonColor("btn_feeder", "#282828");
+      changeStatusColor("feeder_status", "yellow");
+      var message = new Messaging.Message('feeder:stop');
+      message.destinationName = 'POND/RelayToggle';
+      message.qos = 0;
+      client.send(message);
+      document.getElementById("btn_feeder").disabled = true;
+    }
+  });
+</script>
+
+<!-- Dropdown Settings -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const settingsButton = document.getElementById('settingsButton');
+    const dropdown = document.getElementById('settingsDropdown');
+
+    settingsButton.addEventListener('click', (event) => {
+      event.stopPropagation(); // prevent event from bubbling to window
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Close dropdown when clicking outside
+    window.addEventListener('click', () => {
+      dropdown.style.display = 'none';
+    });
+
+    // Prevent closing dropdown when clicking inside
+    dropdown.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
+  });
+</script>
+
+
+</html>
