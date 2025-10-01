@@ -47,21 +47,37 @@ function sendEmail($subject, $body)
     $mail->isSMTP();
     $mail->Host = 'smtp.gmail.com';
     $mail->SMTPAuth = true;
-    $mail->Username = 'innovcentralph@gmail.com';
-    $mail->Password = 'emymneyjnzpyizsh';
+    $mail->Username = 'pondmonitoringthesis@gmail.com';
+    $mail->Password = 'herxppyvtplxjfud';
     $mail->SMTPSecure = 'ssl';
     $mail->Port = 465;
 
-    $mail->setFrom('innovcentralph@gmail.com');
-    $mail->addAddress("bsteps12345@gmail.com");
+    $mail->setFrom('pondmonitoringthesis@gmail.com', 'POND Monitoring System');
+
+    // Multiple recipients
+    $recipients = [
+      "bsteps12345@gmail.com",
+      "salazarbubihis@gmail.com",
+      "danafayereantoco@gmail.com"
+    ];
+
+    foreach ($recipients as $receiver) {
+      $mail->addAddress($receiver);
+    }
+
+    // Optional: add CC or BCC
+    // $mail->addCC("ccperson@example.com");
+    // $mail->addBCC("hidden@example.com");
 
     $mail->isHTML(false); // Send as plain text
 
     $mail->Subject = $subject;
-    $mail->Body = $body;
+    $mail->Body    = $body;
+
     $mail->send();
     return true;
   } catch (Exception $e) {
+    error_log("Mailer Error: " . $mail->ErrorInfo);
     return false;
   }
 }

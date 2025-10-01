@@ -50,11 +50,11 @@
     fetch(url)
       .then(response => response.json())
       .then(data => {
-        console.log('Fetched initial data:', data);
+        // console.log('Fetched initial data:', data);
 
         // Check if chart already exists
         if (lineChart) {
-          console.log("Disposing existing chart...");
+          // console.log("Disposing existing chart...");
           lineChart.dispose();
           // lineChart = null; // Ensure chart is fully cleaned up
         }
@@ -68,7 +68,7 @@
         // Update lastId if data exists
         if (data.length > 0) {
           lastId = Math.max(...data.map(d => d.id));
-          console.log('Initial lastId:', lastId);
+          // console.log('Initial lastId:', lastId);
         }
 
         // Create date axis

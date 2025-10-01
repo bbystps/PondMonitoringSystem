@@ -81,7 +81,7 @@
 
     client.onMessageArrived = function(message) {
         var x = message.payloadString;
-        console.log(x);
+        // console.log(x);
 
         // Sync Toggle Switch to retain value
         if (message.destinationName == "POND/SystemControl") {
@@ -115,9 +115,9 @@
         // Feeder count updates
         else if (message.destinationName == "POND/FeederCount") {
             var ParsedData = JSON.parse(x);
-            console.log(x);
+            // console.log(x);
             const count = Number(ParsedData.feeder_count) || 0;
-            console.log(count);
+            console.log("COUNT: " + count);
 
             // Update the count
             document.getElementById("feeder_count").innerText = count;
@@ -145,8 +145,8 @@
         // Web Update for new sensor data
         else if (message.destinationName == "POND/DeviceStatus") {
             var ParsedData = JSON.parse(x);
-            console.log(x);
-            console.log(ParsedData.status);
+            // console.log(x);
+            // console.log(ParsedData.status);
 
             var icon = document.getElementById("device_status");
             // Change icon color based on count
@@ -160,9 +160,9 @@
         // Relay Triggering 
         else if (message.destinationName == "POND/AllRelayStatus") {
             var ParsedData = JSON.parse(x);
-            console.log(ParsedData.pump);
-            console.log(ParsedData.aerator);
-            console.log(ParsedData.feeder);
+            // console.log(ParsedData.pump);
+            // console.log(ParsedData.aerator);
+            // console.log(ParsedData.feeder);
 
             if (ParsedData.pump == "1") {
                 changeButtonColor("btn_pump", "#ef4444");
@@ -195,18 +195,20 @@
                 document.getElementById("btn_feeder").disabled = false;
                 document.getElementById("btn_feeder").innerText = "Stop Feeder";
             } else if (ParsedData.feeder == "0") {
-
-                feederCount = document.getElementById("feeder_count").innerText;
-                console.log("feeder Count:" + feederCount);
-                if (feederCount != 0) {
-                    changeButtonColor("btn_feeder", "#10b981");
-                    changeStatusColor("feeder_status", "#282828");
-                    document.getElementById("btn_feeder").disabled = false;
-                    document.getElementById("btn_feeder").innerText = "Start Feeder";
-                }
+                changeButtonColor("btn_feeder", "#10b981");
+                changeStatusColor("feeder_status", "#282828");
+                document.getElementById("btn_feeder").disabled = false;
+                document.getElementById("btn_feeder").innerText = "Start Feeder";
+                // feederCount = document.getElementById("feeder_count").innerText;
+                // document.getElementById("btn_feeder").innerText = "Start Feeder";
+                // console.log("feeder Count:" + feederCount);
+                // if (feederCount != 0) {
+                //     changeButtonColor("btn_feeder", "#10b981");
+                //     changeStatusColor("feeder_status", "#282828");
+                //     document.getElementById("btn_feeder").disabled = false;
+                // }
             }
         }
-
 
         // Handle EmailNotification alerts
         else if (message.destinationName == "POND/EmailNotification") {
